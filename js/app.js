@@ -82,7 +82,7 @@ function renderToday() {
     <h1>Today</h1>
     ${
       draft
-        ? `<a href="#/session" class="card" style="display:block;text-decoration:none;color:inherit;border-color:var(--accent)">
+        ? `<a href="#/session" class="card" style="border-color:var(--accent)">
       <strong>&#9654; Resume Workout</strong>
       <p style="margin:4px 0 0">You have a workout in progress.</p>
     </a>`
@@ -278,15 +278,18 @@ function renderTimerWidget() {
   const running = RestTimer.isRunning();
   const rawRemaining = RestTimer.getRemaining();
   const displaySeconds = rawRemaining > 0 ? rawRemaining : restDuration;
+  const pct = rawRemaining > 0 ? Math.round((rawRemaining / restDuration) * 100) : 100;
 
   widget.innerHTML = `
     <div class="card">
       <div class="preset-row">
-        <button class="btn-sm btn-secondary" data-preset="60">60s</button>
-        <button class="btn-sm btn-secondary" data-preset="90">90s</button>
-        <button class="btn-sm btn-secondary" data-preset="120">120s</button>
+        <button class="btn-sm btn-secondary${restDuration === 60 ? ' active' : ''}" data-preset="60">60s</button>
+        <button class="btn-sm btn-secondary${restDuration === 90 ? ' active' : ''}" data-preset="90">90s</button>
+        <button class="btn-sm btn-secondary${restDuration === 120 ? ' active' : ''}" data-preset="120">120s</button>
       </div>
-      <div class="timer-display" id="timer-display">${formatTime(displaySeconds)}</div>
+      <div class="timer-ring" id="timer-ring" style="--pct:${pct}">
+        <div class="timer-display" id="timer-display">${formatTime(displaySeconds)}</div>
+      </div>
       <div class="row">
         <button class="btn btn-secondary btn-sm" id="timer-toggle">${running ? 'Pause' : rawRemaining > 0 ? 'Resume' : 'Start Rest'}</button>
         <button class="btn btn-secondary btn-sm" id="timer-reset">Reset</button>
@@ -321,14 +324,19 @@ function renderTimerWidget() {
 }
 
 function startRestTimer() {
-  RestTimer.start(restDuration, {
+  const total = restDuration;
+  RestTimer.start(total, {
     onTick: (remaining) => {
       const display = document.getElementById('timer-display');
       if (display) display.textContent = formatTime(remaining);
+      const ring = document.getElementById('timer-ring');
+      if (ring) ring.style.setProperty('--pct', Math.round((remaining / total) * 100));
     },
     onDone: () => {
       const display = document.getElementById('timer-display');
       if (display) display.classList.add('done');
+      const ring = document.getElementById('timer-ring');
+      if (ring) ring.style.setProperty('--pct', 0);
       const toggleBtn = document.getElementById('timer-toggle');
       if (toggleBtn) toggleBtn.textContent = 'Start Rest';
     },
@@ -551,7 +559,7 @@ function renderHistory() {
             .map((log) => {
               const routine = log.routineId ? Store.getRoutine(log.routineId) : null;
               const totalSets = log.entries.reduce((sum, e) => sum + e.sets.length, 0);
-              return `<a href="#/history/${log.id}" class="card" style="display:block;text-decoration:none;color:inherit">
+              return `<a href="#/history/${log.id}" class="card">
           <div class="row-between">
             <strong>${routine ? escapeHtml(routine.name) : 'Freestyle Workout'}</strong>
             <span class="text-dim">${fmtDate(log.date)}</span>
@@ -613,7 +621,7 @@ function renderProgressList() {
         : state.exercises
             .map(
               (ex) => `
-      <a href="#/progress/${ex.id}" class="card" style="display:block;text-decoration:none;color:inherit">
+      <a href="#/progress/${ex.id}" class="card">
         <div class="row-between"><strong>${escapeHtml(ex.name)}</strong><span class="text-dim">&rsaquo;</span></div>
       </a>`
             )
