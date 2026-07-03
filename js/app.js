@@ -33,6 +33,12 @@ function setActiveTab(name) {
   document.querySelectorAll('.tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === name));
 }
 
+function paintTabIcons() {
+  document.querySelectorAll('.tab-icon[data-icon]').forEach((el) => {
+    el.innerHTML = Icon(el.dataset.icon);
+  });
+}
+
 // ---------- Router ----------
 function router() {
   const hash = location.hash.replace(/^#\//, '') || 'today';
@@ -60,6 +66,7 @@ function router() {
 
 window.addEventListener('hashchange', router);
 document.addEventListener('DOMContentLoaded', () => {
+  paintTabIcons();
   if (!location.hash) {
     location.hash = '#/today';
   } else {
@@ -83,7 +90,7 @@ function renderToday() {
     ${
       draft
         ? `<a href="#/session" class="card" style="border-color:var(--accent)">
-      <strong>&#9654; Resume Workout</strong>
+      <strong class="row">${Icon('play')} Resume Workout</strong>
       <p style="margin:4px 0 0">You have a workout in progress.</p>
     </a>`
         : ''
@@ -150,7 +157,7 @@ function paintSession(draft) {
   const addedIds = draft.entries.map((e) => e.exerciseId);
   const available = state.exercises.filter((e) => !addedIds.includes(e.id));
 
-  let html = `<div class="top-bar"><a href="#/today" class="back">&larr; Today</a></div>
+  let html = `<div class="top-bar"><a href="#/today" class="back">${Icon('arrowLeft')} Today</a></div>
     <h1>${draft.routineName ? escapeHtml(draft.routineName) : 'Freestyle Workout'}</h1>
     <div id="timer-widget"></div>`;
 
@@ -158,13 +165,13 @@ function paintSession(draft) {
     const ex = exercisesById[entry.exerciseId];
     if (!ex) return;
     html += `<div class="card">
-      <div class="row-between"><h2>${escapeHtml(ex.name)}</h2><button class="btn-icon btn-secondary" data-action="remove-exercise" data-idx="${idx}">&#10005;</button></div>`;
+      <div class="row-between"><h2>${escapeHtml(ex.name)}</h2><button class="btn-icon btn-secondary" data-action="remove-exercise" data-idx="${idx}">${Icon('x')}</button></div>`;
     entry.sets.forEach((set, sidx) => {
       html += `<div class="set-row">
         <div class="set-num">${sidx + 1}</div>
         <input type="number" inputmode="decimal" placeholder="Reps" value="${escapeHtml(set.reps)}" data-action="update-set" data-idx="${idx}" data-sidx="${sidx}" data-field="reps" />
         <input type="number" inputmode="decimal" placeholder="${ex.unit}" value="${escapeHtml(set.weight)}" data-action="update-set" data-idx="${idx}" data-sidx="${sidx}" data-field="weight" />
-        <button class="btn-icon ${set.done ? 'btn' : 'btn-secondary'}" data-action="toggle-set" data-idx="${idx}" data-sidx="${sidx}">${set.done ? '&#10003;' : '&#9675;'}</button>
+        <button class="btn-icon ${set.done ? 'btn' : 'btn-secondary'}" data-action="toggle-set" data-idx="${idx}" data-sidx="${sidx}">${set.done ? Icon('check') : Icon('circle')}</button>
       </div>`;
     });
     html += `<button class="btn btn-secondary btn-sm" data-action="add-set" data-idx="${idx}">+ Add Set</button>
@@ -409,7 +416,7 @@ function renderRoutineEditor(routineId) {
   function paint() {
     const state = Store.getState();
     viewEl.innerHTML = `
-      <div class="top-bar"><a href="#/routines" class="back">&larr; Routines</a></div>
+      <div class="top-bar"><a href="#/routines" class="back">${Icon('arrowLeft')} Routines</a></div>
       <h1>${routine ? 'Edit Routine' : 'New Routine'}</h1>
       <div class="card">
         <label class="text-dim">Name</label>
@@ -499,8 +506,8 @@ function renderExercises() {
           <div class="list-item">
             <div><strong>${escapeHtml(ex.name)}</strong> <span class="badge">${ex.unit}</span></div>
             <div class="row">
-              <button class="btn-icon btn-secondary" data-action="edit-exercise" data-id="${ex.id}">&#9998;</button>
-              <button class="btn-icon btn-secondary" data-action="delete-exercise" data-id="${ex.id}">&#128465;</button>
+              <button class="btn-icon btn-secondary" data-action="edit-exercise" data-id="${ex.id}">${Icon('edit')}</button>
+              <button class="btn-icon btn-secondary" data-action="delete-exercise" data-id="${ex.id}">${Icon('trash')}</button>
             </div>
           </div>`
                 )
@@ -582,7 +589,7 @@ function renderHistoryDetail(id) {
   const routine = log.routineId ? Store.getRoutine(log.routineId) : null;
 
   viewEl.innerHTML = `
-    <div class="top-bar"><a href="#/history" class="back">&larr; History</a></div>
+    <div class="top-bar"><a href="#/history" class="back">${Icon('arrowLeft')} History</a></div>
     <h1>${routine ? escapeHtml(routine.name) : 'Freestyle Workout'}</h1>
     <p class="text-dim">${fmtDateTime(log.date)}</p>
     ${log.entries
@@ -622,7 +629,7 @@ function renderProgressList() {
             .map(
               (ex) => `
       <a href="#/progress/${ex.id}" class="card">
-        <div class="row-between"><strong>${escapeHtml(ex.name)}</strong><span class="text-dim">&rsaquo;</span></div>
+        <div class="row-between"><strong>${escapeHtml(ex.name)}</strong><span class="text-dim">${Icon('chevronRight')}</span></div>
       </a>`
             )
             .join('')
@@ -645,7 +652,7 @@ function renderProgressDetail(id) {
   const best = points.reduce((max, p) => (p.y > max ? p.y : max), 0);
 
   viewEl.innerHTML = `
-    <div class="top-bar"><a href="#/progress" class="back">&larr; Progress</a></div>
+    <div class="top-bar"><a href="#/progress" class="back">${Icon('arrowLeft')} Progress</a></div>
     <h1>${escapeHtml(ex.name)}</h1>
     <div class="card">
       <h2>Top set weight (${ex.unit})</h2>
