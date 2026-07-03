@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1" />
+  <title>Workout</title>
+  <meta name="theme-color" content="#0f1115" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Workout" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <main id="view" class="view"></main>
+
+  <nav class="tabbar" id="tabbar">
+    <a href="#/today" class="tab" data-tab="today">
+      <span class="tab-icon">🏠</span><span>Today</span>
+    </a>
+    <a href="#/routines" class="tab" data-tab="routines">
+      <span class="tab-icon">📋</span><span>Routines</span>
+    </a>
+    <a href="#/exercises" class="tab" data-tab="exercises">
+      <span class="tab-icon">💪</span><span>Exercises</span>
+    </a>
+    <a href="#/history" class="tab" data-tab="history">
+      <span class="tab-icon">🕘</span><span>History</span>
+    </a>
+    <a href="#/progress" class="tab" data-tab="progress">
+      <span class="tab-icon">📈</span><span>Progress</span>
+    </a>
+  </nav>
+
+  <script src="js/store.js"></script>
+  <script src="js/timer.js"></script>
+  <script src="js/charts.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
